@@ -15,7 +15,6 @@ def return_dicom_img_bool_mask(dicom_file, contour_file):
     '''
 
     coords_lst = parse_contour_file(contour_file)
-    print(dicom_file)
     dcm_dict = parse_dicom_file(dicom_file)
     image = dcm_dict['pixel_data']
     height, width = image.shape[:2]
@@ -46,7 +45,7 @@ class TrainingPipeline():
         self.img_size=img_size
         self.shuffle = shuffle
 
-        assert batch_size < len(self), f'Batch size > {len(self)}'
+        assert batch_size <= len(self), f'Batch size > {len(self)}'
 
     def __len__(self):
         return len(self.dicom_csv)
@@ -60,6 +59,8 @@ class TrainingPipeline():
 
         for idx in range(batches):
             batch = self.dicom_csv.iloc[self.batch_size*idx:self.batch_size*idx+self.batch_size, [1,2]].values #grabs sequential rows from data frame
+            if len(batch) == 0:
+                break
             inputs = np.zeros((len(batch), self.img_size, self.img_size))
             labels = np.zeros((len(batch), self.img_size, self.img_size))
 
@@ -68,6 +69,4 @@ class TrainingPipeline():
                 inputs[i] = img
                 labels[i] = mask
 
-
-
-            yield inputs, mask
+            yield inputs, labels
