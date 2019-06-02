@@ -1,6 +1,6 @@
 # Coding Challenge Phase 1
 
-All code written for this challenge will be located in the 'src' directory. You will find four different scripts that I created and the additional parsing.py script that was provided. The 'image' directory has some sample images taken from program logs and data visualization
+All code written for this challenge will be located in the 'src' directory. You will find four different scripts that I created and the additional parsing.py script that was provided. The 'images' directory has some sample images taken from program logs and data visualization
 
 Script Descriptions:
 
