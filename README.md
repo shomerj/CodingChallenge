@@ -84,6 +84,6 @@ As describe a little bit above, there was a small adjustment made to the ```dico
 
 After view some of the given outer and inner contours it seems like there may be some error in the annotations. Without much domain knowledge I cannot be sure, but it would be worth looking into before training a model or moving forward with automating the segmentation process. Here are two example of reasons why there may be an error:
 
-![](https://github.com/shomerj/CodingChallenge/blob/master/images/contours/contour_img40.png)
+![](/images/contours/contour_img40.png)
 
 ![](/images/pixel_intensity/pixel_intensity_15.png)
