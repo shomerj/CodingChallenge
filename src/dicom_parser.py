@@ -19,13 +19,17 @@ class DicomParser():
         dicom_root_dir (str): Path to the DICOM root directory
         contour_root_dir (str): Path to contour root directory
         linker_csv (str): Path to link.csv file
+        contour_type (str): one of either i-contour or o-contour
 
     '''
-    def __init__(self, dicom_root_dir, contour_root_dir, linker_csv):
+    def __init__(self, dicom_root_dir, contour_root_dir, linker_csv, contour_type):
         self.dicom_root_dir = dicom_root_dir
         self.contour_root_dir = contour_root_dir
         self.linker_csv = linker_csv
         self.linker_df = pd.read_csv(linker_csv) #puts linkers csv into a pandas dataframe
+        self.contour_type = contour_type
+
+        assert self.contour_type in['i-contours', 'o-contours'], 'Invalid Contour Type'
 
 
     def _get_contour_index(self, file):
@@ -63,7 +67,7 @@ class DicomParser():
 
             dicom, contour = self.linker_df.loc[row]
             dicom_path = os.path.abspath(os.path.join(self.dicom_root_dir, dicom))#all dicom paths for the given patient
-            contour_path = os.path.abspath(os.path.join(self.contour_root_dir, contour, 'i-contours')) #all contour paths for the given patient
+            contour_path = os.path.abspath(os.path.join(self.contour_root_dir, contour, self.contour_type)) #all contour paths for the given patient
             contours = glob.glob(os.path.join(contour_path, '*.txt'))
             dicoms = glob.glob(os.path.join(dicom_path, '*.dcm'))
             contour_indecies = [self._get_contour_index(os.path.split(file)[-1]) for file in contours]
@@ -86,7 +90,7 @@ class DicomParser():
                 pointer += 1
 
         if save_path:
-            dicom_df.to_csv(os.path.join(save_path, 'dicom_data.csv'), index=False)
+            dicom_df.to_csv(os.path.join(save_path, f'{self.contour_type}_data.csv'), index=False)
 
         return dicom_df
 
@@ -113,11 +117,18 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--linker', required=True, type=str, help='Path to link.csv file')
     parser.add_argument('-s', '--save_dir', default=None, help='Enter save path if you wish to save the DICOM csv file to disk')
     parser.add_argument('--debug', action='store_true', help='Enter debug flag to have print statements shown')
+    parser.add_argument('-o', '--o_contour', action='store_true', help='Enter if dealing with o-contour files')
+    parser.add_argument('-i', '--i_contour', action='store_true', help='Enter if dealing with i-contour files')
+
 
 
     args = parser.parse_args()
 
     DEBUG = args.debug
 
-    dp = DicomParser(args.dicom_data, args.cont_data, args.linker)
+    if args.o_contour:
+        dp = DicomParser(args.dicom_data, args.cont_data, args.linker, 'o-contours' )
+    elif args.i_contour:
+        dp = DicomParser(args.dicom_data, args.cont_data, args.linker, 'i-contours' )
+
     dp.create_dicom_contour_df(save_path=args.save_dir)
